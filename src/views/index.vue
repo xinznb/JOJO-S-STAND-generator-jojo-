@@ -160,6 +160,7 @@
 
 				this.$axios({
 					method: 'post',
+					// Content-Type:'application/x-www-form-urlencoded',
 					data: {
 						q,
 						from: 'auto',
@@ -170,7 +171,7 @@
 							'Y7KLq4Ce7F_9z4X8OQQu'),
 						signType: 'v3',
 					},
-					url: 'https://fanyi-api.baidu.com/api/trans/vip/translate',
+					url: '/fyapi/trans/vip/translate',
 				}).then((res) => {
 					console.log(res);
 				})
