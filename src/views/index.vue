@@ -231,6 +231,8 @@
 				}
 			},
 			generatorStand() {
+				this.draw()
+				this.drawBack()
 				if(!this.standName || !this.standNameTmp){
 					this.$Message.error('请填写替身名和主人名，若想随机生成请等下个版本');
 					return
@@ -239,8 +241,6 @@
 				this.getTran('en', this.standName)
 				this.getTran('jp', `${this.standNameTmp}、${this.standName}`)
 				this.showdiy = !this.showdiy
-				this.draw()
-				this.drawBack()
 			},
 			draw() {
 				// 基于准备好的dom，初始化echarts实例
