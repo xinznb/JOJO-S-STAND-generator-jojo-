@@ -1,23 +1,26 @@
 <template>
-	<div class="container">
+	<div >
 		<fieldset class="diy" v-show="showdiy">
 			<legend>替身生成器</legend>
-			<a-input placeholder="请输入替身名" v-model="standNameTmp" :maxLength=20 class="input-name" />
-			<a-input placeholder="请输入替身主人名字" v-model="standName" class="input-name" :maxLength=20 />
+			<a-input placeholder="请输入替身名" v-model="standName" :maxLength=20 class="input-name" />
+			<a-input placeholder="请输入替身主人名字" v-model="standNameTmp" class="input-name" :maxLength=20 />
 			<a-button type="primary" class="gen-button" @click="generatorStand">
 				生成替身
 			</a-button>
 		</fieldset>
-		<div class="stand-panel" v-show="!showdiy">
+		<div class="stand-panel" v-show="!showdiy" :style="container">
 			<a-button class="back" @click="showdiy=!showdiy">
 				返回
 			</a-button>
-			<div class="left">
+			<div class="left" :style="fontStyle">
 				<div class="left-top">
 					<p class="stand-title">
 						[STAND MASTER] <span class="stand-cn-title">「替身使者」</span>
 					</p>
-					<p class="stand-master">{{ standMasterName }}<span>{{standMasterCNName}}</span></p>
+					<p class="stand-master">
+						<span>{{standMasterJPName}}<br></span>
+						{{ standMasterName }}
+					</p>
 				</div>
 				<div class="left-bottom">
 					<div id="panel">
@@ -25,10 +28,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="right">
+			<div class="right" :style="fontStyle">
 				<p class="stand-title">
 					<span class="stand-cn-title">「替身使者」</span> [STAND NAME]
 				</p>
+				<p class="stand-jp-name">{{standJPName}}</p>
 				<p class="stand-name">{{ standName }}<span>{{standCNName}}({{standENName}})</span></p>
 			</div>
 		</div>
@@ -39,10 +43,18 @@
 	export default {
 		data() {
 			return {
+				container:{
+					'background':''
+				},
+				fontStyle:{
+					'text-shadow': ''
+				},
 				standMasterName: '', //替身主人名字
 				standMasterCNName: '', //替身主人中文名
+				standMasterJPName: '', //替身主人日文名
 				standCNName: '', //替身中文名
 				standENName: '', //替身英文名
+				standJPName: '', //替身日文名
 				standName: '', //替身名字
 				standNameTmp: '',
 				standFNM: '', //替身姓
@@ -135,12 +147,38 @@
 			}
 		},
 		mounted() {
+			this.drawBack()
 			let myChart = this.draw()
 			window.addEventListener('resize', () => {
 				myChart.resize()
 			})
 		},
 		methods: {
+			drawBack(){
+				let color1 = parseInt(Math.random() * 255);
+				let color2 = parseInt(Math.random() * 255);
+				let color3 = parseInt(Math.random() * 255);
+				let color4 = parseInt(Math.random() * 255);
+				let color5 = parseInt(Math.random() * 255);
+				let color6 = parseInt(Math.random() * 255);
+				let random = parseInt(Math.random() * 2);
+				let random3 = parseInt(Math.random() * 2);
+				let softLine = parseInt(Math.random() * 100);
+				
+				let baccolor1 = color1.toString(16)+color2.toString(16)+color3.toString(16)
+				let baccolor2 = color4.toString(16)+color5.toString(16)+color6.toString(16)
+				let arr = ['linear-gradient','radial-gradient']
+				let arr2 = ['to right','to bottom right','to top']
+				let arr3 = ['circle','ellipse']
+				let random2 = parseInt(Math.random() * arr2.length);
+				
+				if(arr[random] == 'linear-gradient'){
+					this.container.background = `linear-gradient(${arr2[random2]},#${baccolor1},${softLine}%,#${baccolor2})`
+				}else{
+					this.container.background = `radial-gradient(${arr3[random3]},#${baccolor1},${softLine}%,#${baccolor2})`
+				}
+				this.fontStyle["text-shadow"] = `0.04rem 0.02rem 0.16rem #${baccolor1}`
+			},
 			uuid() {
 				var s = [];
 				var hexDigits = "0123456789abcdef";
@@ -157,23 +195,32 @@
 			getTran(to, q) { //获取翻译
 				// let input = this.iterateStr(q)
 				let uuid = this.uuid()
+				let sign = this.$md5(this.appid + q + uuid + 'e9uWK7L_VAnk3lAlFFkI')
 
 				this.$axios({
 					method: 'post',
-					// Content-Type:'application/x-www-form-urlencoded',
-					data: {
-						q,
-						from: 'auto',
-						to,
-						appid: this.appid,
-						salt: uuid,
-						sign: this.$md5(this.appid + q + uuid +
-							'Y7KLq4Ce7F_9z4X8OQQu'),
-						signType: 'v3',
-					},
-					url: '/fyapi/trans/vip/translate',
+					// data: {
+					// 	q,
+					// 	from: 'auto',
+					// 	to,
+					// 	appid: this.appid,
+					// 	salt: uuid,
+					// 	sign: this.$md5(this.appid + q + uuid +
+					// 		'e9uWK7L_VAnk3lAlFFkI'),
+					// 	signType: 'v3',
+					// },
+					url: `/fyapi/trans/vip/translate?q=${q}&from=auto&to=${to}&appid=${this.appid}&salt=${uuid}&sign=${sign}`,
+					// url: `/fyapi/trans/vip/translate`,
 				}).then((res) => {
-					console.log(res);
+					if (res.data.to == 'jp') {
+						console.log(res.data.trans_result[0]);
+						let str = res.data.trans_result[0].dst
+						let arr = str.split('、')
+						this.standJPName = arr[1]
+						this.standMasterJPName = arr[0]
+					} else if (res.data.to == 'en') {
+						this.standENName = res.data.trans_result[0].dst
+					}
 				})
 			},
 			iterateStr(q) {
@@ -184,10 +231,16 @@
 				}
 			},
 			generatorStand() {
-				this.getTran('JA', this.standNameTmp)
-				this.standName = this.standNameTmp
-				this.standMasterName = this.standName
+				if(!this.standName || !this.standNameTmp){
+					this.$Message.error('请填写替身名和主人名，若想随机生成请等下个版本');
+					return
+				}
+				this.standMasterName = this.standNameTmp
+				this.getTran('en', this.standName)
+				this.getTran('jp', `${this.standNameTmp}、${this.standName}`)
 				this.showdiy = !this.showdiy
+				this.draw()
+				this.drawBack()
 			},
 			draw() {
 				// 基于准备好的dom，初始化echarts实例
@@ -235,7 +288,6 @@
 </script>
 
 <style scoped lang="scss">
-	.container {
 		.diy {
 			width: 4.5rem;
 			height: 4.0rem;
@@ -248,6 +300,10 @@
 			text-align: center;
 			background-color: rgba(52, 122, 221, .1);
 			margin: 0 auto;
+
+			p {
+				display: inline;
+			}
 
 			legend {
 				width: auto;
@@ -268,9 +324,9 @@
 		}
 
 		.stand-panel {
+			display: flex;
 			width: auto;
 			padding: 0.4rem 1rem;
-
 			.back {
 				position: absolute;
 				right: 0;
@@ -281,16 +337,32 @@
 				font-family: "Philosopher";
 
 				.stand-cn-title {
-					font-size: 0.38rem;
+					font-size: 0.48rem;
 				}
 			}
 
-			.left {
-				.stand-master {
-					font-family: "yc";
-				}
+			.stand-jp-name {
+				font-size: 0.48rem;
+				font-family: "yc";
+			}
 
-				.left-top {}
+			.left {
+				width: 50%;
+				color: whitesmoke;
+				.left-top {
+					margin-right: 1.6rem;
+					.stand-master {
+						font-family: 'sj';
+						font-size: 0.32rem;
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						span{
+							font-size: 0.48rem;
+							font-family: "yc";
+						}
+					}
+				}
 
 				.left-bottom {
 					width: 4rem;
@@ -315,12 +387,18 @@
 			}
 
 			.right {
+				align-self: flex-end;
 				text-align: right;
+				width: 50%;
+				color: whitesmoke;
 
 				.stand-name {
-					font-family: "yc";
+					font-family: 'sj';
+					font-size: 0.32rem;
+					span{
+						font-family: "Philosopher";
+					}
 				}
 			}
 		}
-	}
 </style>

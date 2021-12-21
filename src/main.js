@@ -6,7 +6,8 @@ import '@/assets/font.css';
 import 'ant-design-vue/dist/antd.css';
 import {
 	Button,
-	Input
+	Input,
+	message
 } from 'ant-design-vue';
 import * as echarts from 'echarts/core';
 import {
@@ -29,6 +30,7 @@ echarts.use([TitleComponent, LegendComponent, RadarChart, CanvasRenderer]);
 Vue.prototype.$md5 = md5;
 Vue.prototype.$echarts = echarts
 Vue.prototype.$axios = axios
+Vue.prototype.$Message = message
 Vue.config.productionTip = false
 
 new Vue({
