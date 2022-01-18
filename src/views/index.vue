@@ -1,5 +1,5 @@
 <template>
-	<div >
+	<div>
 		<fieldset class="diy" v-show="showdiy">
 			<legend>替身生成器</legend>
 			<a-input placeholder="请输入替身名" v-model="standName" :maxLength=20 class="input-name" />
@@ -43,10 +43,10 @@
 	export default {
 		data() {
 			return {
-				container:{
-					'background':''
+				container: {
+					'background': ''
 				},
-				fontStyle:{
+				fontStyle: {
 					'text-shadow': ''
 				},
 				standMasterName: '', //替身主人名字
@@ -154,7 +154,7 @@
 			})
 		},
 		methods: {
-			drawBack(){
+			drawBack() {
 				let color1 = parseInt(Math.random() * 255);
 				let color2 = parseInt(Math.random() * 255);
 				let color3 = parseInt(Math.random() * 255);
@@ -164,18 +164,20 @@
 				let random = parseInt(Math.random() * 2);
 				let random3 = parseInt(Math.random() * 2);
 				let softLine = parseInt(Math.random() * 100);
-				
-				let baccolor1 = color1.toString(16)+color2.toString(16)+color3.toString(16)
-				let baccolor2 = color4.toString(16)+color5.toString(16)+color6.toString(16)
-				let arr = ['linear-gradient','radial-gradient']
-				let arr2 = ['to right','to bottom right','to top']
-				let arr3 = ['circle','ellipse']
+
+				let baccolor1 = color1.toString(16) + color2.toString(16) + color3.toString(16)
+				let baccolor2 = color4.toString(16) + color5.toString(16) + color6.toString(16)
+				let arr = ['linear-gradient', 'radial-gradient']
+				let arr2 = ['to right', 'to bottom right', 'to top']
+				let arr3 = ['circle', 'ellipse']
 				let random2 = parseInt(Math.random() * arr2.length);
-				
-				if(arr[random] == 'linear-gradient'){
-					this.container.background = `linear-gradient(${arr2[random2]},#${baccolor1},${softLine}%,#${baccolor2})`
-				}else{
-					this.container.background = `radial-gradient(${arr3[random3]},#${baccolor1},${softLine}%,#${baccolor2})`
+
+				if (arr[random] == 'linear-gradient') {
+					this.container.background =
+						`linear-gradient(${arr2[random2]},#${baccolor1},${softLine}%,#${baccolor2})`
+				} else {
+					this.container.background =
+						`radial-gradient(${arr3[random3]},#${baccolor1},${softLine}%,#${baccolor2})`
 				}
 				this.fontStyle["text-shadow"] = `0.04rem 0.02rem 0.16rem #${baccolor1}`
 			},
@@ -215,7 +217,7 @@
 					if (res.data.to == 'jp') {
 						console.log(res.data.trans_result[0]);
 						let str = res.data.trans_result[0].dst
-						let arr = str.split('、')
+						let arr = str.split('~')
 						this.standJPName = arr[1]
 						this.standMasterJPName = arr[0]
 					} else if (res.data.to == 'en') {
@@ -233,13 +235,13 @@
 			generatorStand() {
 				this.draw()
 				this.drawBack()
-				if(!this.standName || !this.standNameTmp){
+				if (!this.standName || !this.standNameTmp) {
 					this.$Message.error('请填写替身名和主人名，若想随机生成请等下个版本');
 					return
 				}
 				this.standMasterName = this.standNameTmp
 				this.getTran('en', this.standName)
-				this.getTran('jp', `${this.standNameTmp}、${this.standName}`)
+				this.getTran('jp', `${this.standNameTmp}~${this.standName}`)
 				this.showdiy = !this.showdiy
 			},
 			draw() {
@@ -288,117 +290,149 @@
 </script>
 
 <style scoped lang="scss">
-		.diy {
-			width: 4.5rem;
-			height: 4.0rem;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			border-radius: 0.05rem;
-			border: 1px solid rgba(52, 122, 221, 0.8);
-			text-align: center;
-			background-color: rgba(52, 122, 221, .1);
-			margin: 0 auto;
+	
 
-			p {
-				display: inline;
-			}
+	.diy {
+		width: 4.5rem;
+		height: 4.0rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		border-radius: 0.05rem;
+		border: 1px solid rgba(52, 122, 221, 0.8);
+		text-align: center;
+		background-color: rgba(52, 122, 221, .1);
+		margin: 0 auto;
 
-			legend {
-				width: auto;
-				color: #347add;
-				padding: 0.05rem;
-				font-weight: 700;
-				// text-shadow: 0.02rem 0.02rem 0.02rem rgb(52,122,221);
-			}
+		p {
+			display: inline;
+		}
 
-			.input-name {
-				margin-top: 0.2rem;
-				width: 3.5rem;
-			}
+		legend {
+			width: auto;
+			color: #347add;
+			padding: 0.05rem;
+			font-weight: 700;
+			// text-shadow: 0.02rem 0.02rem 0.02rem rgb(52,122,221);
+		}
 
-			.gen-button {
-				margin-top: 0.55rem;
+		.input-name {
+			margin-top: 0.2rem;
+			width: 3.5rem;
+		}
+
+		.gen-button {
+			margin-top: 0.55rem;
+		}
+	}
+
+	.stand-panel {
+		display: flex;
+		width: auto;
+		padding: 0.4rem 1rem;
+
+		.back {
+			position: absolute;
+			right: 0;
+		}
+
+		.stand-title {
+			font-size: 0.5rem;
+			font-family: "Philosopher";
+
+			.stand-cn-title {
+				font-size: 0.48rem;
 			}
 		}
 
-		.stand-panel {
-			display: flex;
-			width: auto;
-			padding: 0.4rem 1rem;
-			.back {
-				position: absolute;
-				right: 0;
-			}
+		.stand-jp-name {
+			font-size: 0.48rem;
+			font-family: "yc";
+		}
 
-			.stand-title {
-				font-size: 0.5rem;
-				font-family: "Philosopher";
+		.left {
+			width: 50%;
+			color: whitesmoke;
 
-				.stand-cn-title {
-					font-size: 0.48rem;
-				}
-			}
+			.left-top {
+				margin-right: 1.6rem;
 
-			.stand-jp-name {
-				font-size: 0.48rem;
-				font-family: "yc";
-			}
+				.stand-master {
+					font-family: 'sj';
+					font-size: 0.32rem;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
 
-			.left {
-				width: 50%;
-				color: whitesmoke;
-				.left-top {
-					margin-right: 1.6rem;
-					.stand-master {
-						font-family: 'sj';
-						font-size: 0.32rem;
-						display: flex;
-						flex-direction: column;
-						align-items: center;
-						span{
-							font-size: 0.48rem;
-							font-family: "yc";
-						}
+					span {
+						font-size: 0.48rem;
+						font-family: "yc";
 					}
 				}
+			}
 
-				.left-bottom {
+			.left-bottom {
+				width: 4rem;
+				height: 4rem;
+				background-image: url(../assets/img/panelBack.png);
+				background-position: center;
+				background-size: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin-top: 2rem;
+
+				#panel {
 					width: 4rem;
 					height: 4rem;
-					background-image: url(../assets/img/panelBack.png);
-					background-position: center;
-					background-size: 100%;
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					margin-top: 2rem;
-
-					#panel {
-						width: 4rem;
-						height: 4rem;
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						background-color: transparent;
-					}
-				}
-			}
-
-			.right {
-				align-self: flex-end;
-				text-align: right;
-				width: 50%;
-				color: whitesmoke;
-
-				.stand-name {
-					font-family: 'sj';
-					font-size: 0.32rem;
-					span{
-						font-family: "Philosopher";
-					}
+					background-color: transparent;
 				}
 			}
 		}
+
+		.right {
+			align-self: flex-end;
+			text-align: right;
+			width: 50%;
+			color: whitesmoke;
+
+			.stand-name {
+				font-family: 'sj';
+				font-size: 0.32rem;
+
+				span {
+					font-family: "Philosopher";
+				}
+			}
+		}
+	}
+</style>
+
+<style scoped lang="scss">
+	@media screen and (max-width:750px) {
+		.stand-panel {
+			flex-direction: column;
+			align-items: center;
+		}
+		.left{
+			width: initial !important;
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			.left-top{
+				margin-right: 0;
+			}
+			.left-bottom{
+				margin: 1rem 0;
+			}
+		}
+		.right{
+			align-self: normal;
+			width: initial;
+		}
+	}
 </style>
